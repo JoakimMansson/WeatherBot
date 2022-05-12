@@ -24,10 +24,11 @@ driver.switch_to.default_content()
 goToWeather = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//span[@class='js-close link']")))
 goToWeather.click()
 
-print(driver.page_source)
-clickOnTodaysWeather = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "")))
+clickOnTodaysWeather = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "day-1")))
 clickOnTodaysWeather.click()
 
+
+times = {}
 
 #time.sleep(6)
 
