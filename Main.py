@@ -21,6 +21,8 @@ if __name__ == "__main__":
     ThreeLowestTemps = weather.get_N_Lowest(temperature, 3, 0, 24)
     AverageCloudiness = weather.getAverage(cloudExpectancy,9,16)
 
+    weather.send_notify("\n" + "\n")
+
     if HighestRainProb[1][0] > 10:
 
         if HighestMiliRain is None:

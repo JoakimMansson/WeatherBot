@@ -82,6 +82,9 @@ class Klart:
     #@PARAM end_hour when to stop fetching values (must be between or equal to 0 and 24)
     def get_N_Highest(self, inputDict: dict, nrValues: int, startHour: int, endHour: int) -> Tuple[List[str], List[float]]:
 
+        if len(inputDict.keys()) == 0:
+            return None
+
         valueList = []
         for key in inputDict:
 
@@ -130,7 +133,7 @@ class Klart:
     #@PARAM end_hour when to stop fetching values (must be between or equal to 0 and 24)
     def get_N_Lowest(self, inputDict: dict, nrValues: int, startHour: int, endHour: int) -> Tuple[List[str], List[float]]:
 
-        if inputDict.keys() == 0:
+        if len(inputDict.keys()) == 0:
             return None
 
 
