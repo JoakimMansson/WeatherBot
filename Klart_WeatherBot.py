@@ -2,15 +2,14 @@ import bisect
 import datetime
 import heapq
 import time
-from operator import itemgetter
-
 import requests
 import selenium
 import re
 import linecache
 import numpy as np
 
-from typing import Tuple, List, Optional
+from operator import itemgetter
+from typing import Tuple, List
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -176,9 +175,6 @@ class Klart:
                     counter += 1
 
         return CorrespondingHours, lowestValues
-
-
-
 
 
     def getAverage(self, inputDict: dict, startHour: int, endHour: int):
