@@ -1,5 +1,8 @@
+import bisect
 import datetime
+import heapq
 import time
+from operator import itemgetter
 
 import requests
 import selenium
@@ -77,39 +80,48 @@ class Klart:
     #@PARAM number the amount of different values you want to be returned
     #@PARAM start_hour the starting hour to get values from (must be between or equal to 0 and 24)
     #@PARAM end_hour when to stop fetching values (must be between or equal to 0 and 24)
-    def get_N_Highest(self, inputDict: dict, nrValues: int, start_hour: int, end_hour: int) -> Tuple[List[str], List[float]]:
+    def get_N_Highest(self, inputDict: dict, nrValues: int, startHour: int, endHour: int) -> Tuple[List[str], List[float]]:
 
-        maxInt = -9999
-        valueDictionary = {}
-        for i in range(start_hour, end_hour):     #In range of 06:00 to 21:00
-            try:
-                value = inputDict.get(self.__intToTimeConvert(i))        #Gets temperature of current time
-                print(value)
-                self.__appendToList(valueDictionary, value, self.__intToTimeConvert(i))          #Flipping (XX:00:VAL) to (VAL:XX:00) and appending to list
+        valueList = []
+        for key in inputDict:
 
-                if value > maxInt:
-                    maxInt = value
-            except:
-                pass
+            if len(valueList) == 0:
+                valueList.append({key: inputDict.get(key)})
 
-        HighestValues = []
+            else:
+                check = False
+                for i in range(len(valueList)):
+                    if check:
+                        break
+
+                    for tempKey in valueList[i].keys():
+
+                        if inputDict.get(key) <= inputDict.get(tempKey):
+                            valueList.insert(i, {key:inputDict.get(key)})
+                            check = True
+
+                        if inputDict.get(key) > inputDict.get(tempKey):
+                            while inputDict.get(key) > inputDict.get(tempKey) and i < len(valueList):
+                                i += 1
+                            valueList.insert(i+1, {key: inputDict.get(key)})
+                            check = True
+
+
+        highestValues = []
         CorrespondingHours = []
         counter = 0
-        for i in range(maxInt, -30, -1):
-            if counter >= nrValues:
+        for i in range(len(valueList)-1, -1, -1):
+
+            if counter == nrValues:
                 break
-            try:
-                if valueDictionary.get(i) is not None:
-                    for j in range(len(valueDictionary.get(i))):
-                        HighestValues.append(i)
-                        CorrespondingHours.append(valueDictionary.get(i)[j])
-                        print(i)
-                        counter += 1
-            except:
-                pass
 
+            for key in valueList[i]:
+                if startHour <= self.__timeToIntConvert(key) <= endHour:
+                    highestValues.append(valueList[i].get(key))
+                    CorrespondingHours.append(key)
+                    counter += 1
 
-        return CorrespondingHours, HighestValues
+        return CorrespondingHours, highestValues
 
 
     #@PARAM hour_optional a dictionary that contains an hour (16:00, 20:00) and an integer value
@@ -118,38 +130,52 @@ class Klart:
     #@PARAM end_hour when to stop fetching values (must be between or equal to 0 and 24)
     def get_N_Lowest(self, inputDict: dict, nrValues: int, startHour: int, endHour: int) -> Tuple[List[str], List[float]]:
 
-        minInt = 9999
-        valueDictionary = {}
-        for i in range(startHour, endHour):                              #In range of 06:00 to 21:00
-            try:
-                value = inputDict.get(self.__intToTimeConvert(i))    #Gets temperature of current time
-                self.__appendToList(valueDictionary, value, self.__intToTimeConvert(i))
+        if inputDict.keys() == 0:
+            return None
 
-                if value < minInt:
-                    minInt = value
-                    print("value: " + value)
-            except:
-                pass
 
-        LowestValues = []
+        valueList = []
+        for key in inputDict:
+
+            if len(valueList) == 0:
+                valueList.append({key: inputDict.get(key)})
+
+            else:
+                check = False
+                for i in range(len(valueList)):
+                    if check:
+                        break
+
+                    for tempKey in valueList[i].keys():
+
+                        if inputDict.get(key) <= inputDict.get(tempKey):
+                            valueList.insert(i, {key: inputDict.get(key)})
+                            check = True
+
+                        if inputDict.get(key) > inputDict.get(tempKey):
+                            while inputDict.get(key) > inputDict.get(tempKey) and i < len(valueList):
+                                i += 1
+                            valueList.insert(i + 1, {key: inputDict.get(key)})
+                            check = True
+
+        lowestValues = []
         CorrespondingHours = []
         counter = 0
-        for i in range(minInt, 100, 1):
-            if counter >= nrValues:
+        for i in range(len(valueList)):
+
+            if counter == nrValues:
                 break
-            try:
-                if valueDictionary.get(i) is not None:
-                    for j in range(len(valueDictionary.get(i))):
-                        LowestValues.append(i)
-                        CorrespondingHours.append(valueDictionary.get(i)[j])
-                        print(i)
-                        counter += 1
-            except:
-                pass
+
+            for key in valueList[i]:
+                if startHour <= self.__timeToIntConvert(key) <= endHour:
+                    lowestValues.append(valueList[i].get(key))
+                    CorrespondingHours.append(key)
+                    counter += 1
+
+        return CorrespondingHours, lowestValues
 
 
 
-        return CorrespondingHours, LowestValues
 
 
     def getAverage(self, inputDict: dict, startHour: int, endHour: int):
